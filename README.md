@@ -7,7 +7,8 @@
 ![Minecraft](https://img.shields.io/badge/Minecraft-26.3-62B47A?style=for-the-badge&logo=minecraft&logoColor=white)
 ![Fabric](https://img.shields.io/badge/Fabric-0.19.5-DBD0B4?style=for-the-badge)
 ![GPU](https://img.shields.io/badge/GPU-solo%20RDNA%204-ED1C24?style=for-the-badge&logo=amd&logoColor=white)
-![Estado](https://img.shields.io/badge/estado-1.0.0--beta.2-orange?style=for-the-badge)
+![Windows](https://img.shields.io/badge/SO-solo%20Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white)
+![Estado](https://img.shields.io/badge/estado-BETA%201.0.0--beta.2-orange?style=for-the-badge)
 ![Licencia](https://img.shields.io/badge/c%C3%B3digo-MIT-blue?style=for-the-badge)
 
 **[⬇️ Descargar el .jar (Releases)](../../releases/latest)**
@@ -15,6 +16,9 @@
 </div>
 
 ---
+
+> 🚧 **Versión BETA.** Puede tener fallos y cambiar entre versiones.
+> 🪟 **Solo Windows 10/11** (usa DirectX 12 + Vulkan). Linux no está soportado en este jar.
 
 ## ✨ ¿Qué es esto?
 
@@ -28,7 +32,7 @@ Un mod para **Minecraft Java** que te da **más FPS y una imagen más nítida** 
 | 📊 **Contador de FPS** | Arriba a la derecha: `N FPS reales \| M en pantalla`. |
 | 📦 **Todo en uno** | Un solo `.jar` que ya trae Fabric API, Sodium, Lithium, C2ME y otros mods de optimización, coordinados entre sí. |
 
-> ⚠️ **Solo para RDNA 4** (Radeon **RX 9000**: 9060 XT, 9070, 9070 XT…).
+> ⚠️ **Solo para RDNA 4 y solo en Windows** (Radeon **RX 9000**: 9060 XT, 9070, 9070 XT…).
 > FSR 4 usa las unidades de IA de RDNA 4, así que **no funciona en RDNA 3 o anteriores, ni en NVIDIA/Intel**.
 > Desarrollado y probado en una **RX 9060 XT**.
 
