@@ -1,0 +1,82 @@
+// SugarSV all-in-one jar: the fsr4linux jar + every compatible mod of the measured setup as Fabric nested jars (META-INF/jars, loaded by
+// Fabric Loader exactly as if they were in mods/) + the Windows native runtime (extracted by SugarSvPreLaunch into config/fsr4linux-runtime).
+//   gradlew.bat allInOneJar   ->  build/libs/SugarSV-<version>-todo-en-uno.jar
+// Mod and runtime locations can be overridden with -PsugarsvMods=<dir;dir> and -PsugarsvRuntime=<dir>. PRIVATE USE: several bundled mods
+// (e.g. Sodium) do not allow redistributing them this way; the jar lists every bundled mod and its licence in META-INF/sugarsv/THIRD_PARTY.txt.
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+
+def home = System.getProperty('user.home')
+def modDirs = (project.findProperty('sugarsvMods') ?: "${home}/OneDrive/Desktop/SugarSV-Mods;${home}/OneDrive/Desktop/Mod_FSR4_Java_Windows/dependencias_terceros").split(';').collect { file(it) }
+def runtimeDir = file(project.findProperty('sugarsvRuntime') ?: 'run/config/fsr4linux-runtime')
+// The measured profile (docs/MOD_INTEGRATION.md, stage s3). Not bundled on purpose: Iris, Noisium, ModernFix, EnhancedBlockEntities, Sodium Extra,
+// MoreCulling (need Sodium 0.9.3, which breaks Aetherium 0.1.3), Dynamic FPS / FpsReducer2 (cap the frame rate), Krypton, Ksyxis, MemoryLeakFix.
+def bundledMods = [
+    'fabric-api-0.166.2+26.3.jar',
+    'sodium-fabric-0.9.2+mc26.3.jar',
+    'aetherium-0.1.3-mc26.3-fabric.jar',
+    'ImmediatelyFast-Fabric-1.17.1+26.3.jar',
+    'BadOptimizations-2.4.1-26.3-fabric.jar',
+    'entityculling-fabric-1.12.1-mc26.3.jar',
+    'ferritecore-9.0.0-fabric.jar',
+    'lithium-fabric-0.26.3+mc26.3.jar',
+    'c2me-fabric-mc26.3-0.4.2-alpha.0.119.jar',
+    'servercore-fabric-1.5.20+26.3.jar',
+    'Clumps-fabric-26.3-26.3.2.jar',
+    'alternate-current-mc26.3-1.9.0.jar'
+]
+def runtimeFiles = ['lib/fsr4linux.dll', 'bridge/fsr4_bridge.exe', 'bridge/amd_fidelityfx_loader_dx12.dll', 'bridge/amd_fidelityfx_upscaler_dx12.dll',
+                    'bridge/amd_fidelityfx_framegeneration_dx12.dll', 'bridge/AMD_FidelityFX_SDK_license.md', 'bridge/AMD_3rdpartynotice.md']
+
+tasks.register('allInOneJar') {
+    group = 'build'
+    description = 'SugarSV all-in-one jar (mod + bundled mods + native runtime)'
+    dependsOn tasks.named('jar')
+    def out = layout.buildDirectory.file("libs/SugarSV-${project.version}-todo-en-uno.jar")
+    inputs.files(tasks.named('jar'))   // without declared inputs Gradle treated the task as up to date and kept a stale jar
+    inputs.files(bundledMods.collect { n -> modDirs.collect { new File(it, n) } }.flatten().findAll { it.isFile() })
+    inputs.files(runtimeFiles.collect { new File(runtimeDir, it) }.findAll { it.isFile() })
+    outputs.file(out)
+    doLast {
+        def sha = { File f -> MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString() }
+        def baseJar = tasks.named('jar').get().archiveFile.get().asFile
+        def mods = bundledMods.collect { n -> def f = modDirs.collect { new File(it, n) }.find { it.isFile() }; if (f == null) throw new GradleException("bundled mod not found: ${n} (looked in ${modDirs})"); f }
+        def rt = runtimeFiles.collect { r ->
+            def f = new File(runtimeDir, r)
+            if (!f.isFile() && r.endsWith('.md')) f = new File("${home}/OneDrive/Desktop/Mod_FSR4_Java_Windows/AMD_DLL_y_licencia", f.name)
+            if (!f.isFile()) throw new GradleException("runtime file not found: ${r} (in ${runtimeDir})"); [r, f] }
+        def outFile = out.get().asFile; outFile.parentFile.mkdirs()
+        def third = new StringBuilder("SugarSV all-in-one ${project.version}: bundled mods (unmodified jars, loaded by Fabric as nested jars). PRIVATE USE ONLY.\n\n")
+        new ZipOutputStream(new FileOutputStream(outFile)).withCloseable { zos ->
+            new ZipFile(baseJar).withCloseable { zip ->
+                zip.entries().each { e ->
+                    if (e.directory) return
+                    if (e.name == 'fabric.mod.json') {
+                        def json = new JsonSlurper().parseText(zip.getInputStream(e).text)
+                        json.name = 'SugarSV Ultimate (FSR 4.1 + Frame Generation + optimización integrada)'
+                        json.description = 'Todo en uno para RX 9060 XT: FSR 4.1 oficial de AMD, AMD FG x2 (ANR FG y x3/x4 experimentales), pacing automático con VSync, Aetherium + Sodium y los mods de optimización coordinados (un único responsable por optimización). Uso privado.'
+                        json.jars = mods.collect { [file: "META-INF/jars/${it.name}"] }
+                        zos.putNextEntry(new ZipEntry('fabric.mod.json')); zos.write(JsonOutput.prettyPrint(JsonOutput.toJson(json)).getBytes('UTF-8')); zos.closeEntry()
+                        return
+                    }
+                    zos.putNextEntry(new ZipEntry(e.name)); zos << zip.getInputStream(e); zos.closeEntry()
+                }
+            }
+            mods.each { f ->
+                zos.putNextEntry(new ZipEntry("META-INF/jars/${f.name}")); zos << f.bytes; zos.closeEntry()
+                new ZipFile(f).withCloseable { z -> def fm = z.getEntry('fabric.mod.json'); def j = fm ? new JsonSlurper().parseText(z.getInputStream(fm).getText('UTF-8')) : [:]
+                    third.append(String.format('%-28s %-28s licence: %s%n', j.id ?: f.name, j.version ?: '?', j.license ?: 'see the mod')) }
+            }
+            def manifest = new StringBuilder('# sha256 path (extracted to config/fsr4linux-runtime by SugarSvPreLaunch)\n')
+            rt.each { r, f -> zos.putNextEntry(new ZipEntry("sugarsv-runtime/${r}")); zos << f.bytes; zos.closeEntry(); manifest.append("${sha(f)} ${r}\n") }
+            zos.putNextEntry(new ZipEntry('sugarsv-runtime/MANIFEST')); zos.write(manifest.toString().getBytes('UTF-8')); zos.closeEntry()
+            third.append('\nNative runtime: fsr4linux.dll / fsr4_bridge.exe (this project, MIT) and the official AMD FidelityFX SDK 2.4.0 DLLs (binary only, see AMD_FidelityFX_SDK_license.md).\n')
+            zos.putNextEntry(new ZipEntry('META-INF/sugarsv/THIRD_PARTY.txt')); zos.write(third.toString().getBytes('UTF-8')); zos.closeEntry()
+        }
+        println "SugarSV all-in-one: ${outFile} (${(outFile.length() / 1048576).round(1)} MiB, ${mods.size()} mods, ${rt.size()} runtime files)"
+    }
+}
