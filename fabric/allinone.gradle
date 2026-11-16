@@ -1,8 +1,8 @@
 // SugarSV all-in-one jar: the fsr4linux jar + every compatible mod of the measured setup as Fabric nested jars (META-INF/jars, loaded by
 // Fabric Loader exactly as if they were in mods/) + the Windows native runtime (extracted by SugarSvPreLaunch into config/fsr4linux-runtime).
 //   gradlew.bat allInOneJar   ->  build/libs/SugarSV-<version>-todo-en-uno.jar
-// Mod and runtime locations can be overridden with -PsugarsvMods=<dir;dir> and -PsugarsvRuntime=<dir>. PRIVATE USE: several bundled mods
-// (e.g. Sodium) do not allow redistributing them this way; the jar lists every bundled mod and its licence in META-INF/sugarsv/THIRD_PARTY.txt.
+// Mod and runtime locations can be overridden with -PsugarsvMods=<dir;dir> and -PsugarsvRuntime=<dir>. Several bundled mods
+// (e.g. Sodium, now PolyForm Shield) have special redistribution conditions; the jar lists every bundled mod, licence, author and link in META-INF/sugarsv/THIRD_PARTY.txt.
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import java.security.MessageDigest
@@ -29,6 +29,9 @@ def bundledMods = [
     'Clumps-fabric-26.3-26.3.2.jar',
     'alternate-current-mc26.3-1.9.0.jar'
 ]
+// licence not declared in the mod's fabric.mod.json: taken from its upstream repository (THIRD_PARTY_LICENSES/)
+def licenceOverrides = ['badoptimizations': 'ISC (upstream repository)']
+def licenceFiles = (file('../THIRD_PARTY_LICENSES').listFiles() ?: new File[0]).findAll { it.isFile() }.sort { it.name }
 def runtimeFiles = ['lib/fsr4linux.dll', 'bridge/fsr4_bridge.exe', 'bridge/amd_fidelityfx_loader_dx12.dll', 'bridge/amd_fidelityfx_upscaler_dx12.dll',
                     'bridge/amd_fidelityfx_framegeneration_dx12.dll', 'bridge/AMD_FidelityFX_SDK_license.md', 'bridge/AMD_3rdpartynotice.md']
 
@@ -50,7 +53,7 @@ tasks.register('allInOneJar') {
             if (!f.isFile() && r.endsWith('.md')) f = new File("${home}/OneDrive/Desktop/Mod_FSR4_Java_Windows/AMD_DLL_y_licencia", f.name)
             if (!f.isFile()) throw new GradleException("runtime file not found: ${r} (in ${runtimeDir})"); [r, f] }
         def outFile = out.get().asFile; outFile.parentFile.mkdirs()
-        def third = new StringBuilder("SugarSV all-in-one ${project.version}: bundled mods (unmodified jars, loaded by Fabric as nested jars). PRIVATE USE ONLY.\n\n")
+        def third = new StringBuilder("SugarSV all-in-one ${project.version}: bundled mods (unmodified jars, loaded by Fabric as nested jars).\nEach mod keeps its own licence; the full licence texts are in META-INF/sugarsv/licenses/ (and THIRD_PARTY_LICENSES/ in the repository).\n\n")
         new ZipOutputStream(new FileOutputStream(outFile)).withCloseable { zos ->
             new ZipFile(baseJar).withCloseable { zip ->
                 zip.entries().each { e ->
@@ -58,7 +61,7 @@ tasks.register('allInOneJar') {
                     if (e.name == 'fabric.mod.json') {
                         def json = new JsonSlurper().parseText(zip.getInputStream(e).text)
                         json.name = 'SugarSV Ultimate (FSR 4.1 + Frame Generation + optimización integrada)'
-                        json.description = 'Todo en uno para RX 9060 XT: FSR 4.1 oficial de AMD, AMD FG x2 (ANR FG y x3/x4 experimentales), pacing automático con VSync, Aetherium + Sodium y los mods de optimización coordinados (un único responsable por optimización). Uso privado.'
+                        json.description = 'Todo en uno para RX 9060 XT: FSR 4.1 oficial de AMD, AMD FG x2 (ANR FG y x3/x4 experimentales), pacing automático con VSync, Aetherium + Sodium y los mods de optimización coordinados (un único responsable por optimización).'
                         json.jars = mods.collect { [file: "META-INF/jars/${it.name}"] }
                         zos.putNextEntry(new ZipEntry('fabric.mod.json')); zos.write(JsonOutput.prettyPrint(JsonOutput.toJson(json)).getBytes('UTF-8')); zos.closeEntry()
                         return
@@ -69,8 +72,15 @@ tasks.register('allInOneJar') {
             mods.each { f ->
                 zos.putNextEntry(new ZipEntry("META-INF/jars/${f.name}")); zos << f.bytes; zos.closeEntry()
                 new ZipFile(f).withCloseable { z -> def fm = z.getEntry('fabric.mod.json'); def j = fm ? new JsonSlurper().parseText(z.getInputStream(fm).getText('UTF-8')) : [:]
-                    third.append(String.format('%-28s %-28s licence: %s%n', j.id ?: f.name, j.version ?: '?', j.license ?: 'see the mod')) }
+                    def authors = (j.authors ?: []).collect { it instanceof String ? it : it.name }.join(', ')
+                    def contact = j.contact ?: [:]
+                    def link = contact.homepage ?: contact.sources ?: '(no link declared by the mod)'
+                    def lic = j.license instanceof List ? j.license.join(' / ') : (j.license ?: licenceOverrides[j.id])
+                    third.append("${j.name ?: j.id} (${j.id})\n  version : ${j.version ?: '?'}\n  licence : ${lic ?: 'see the mod'}\n  author  : ${authors ?: '?'}\n  link    : ${link}\n")
+                    if (contact.sources && contact.sources != link) third.append("  source  : ${contact.sources}\n")
+                    third.append("\n") }
             }
+            licenceFiles.each { lf -> zos.putNextEntry(new ZipEntry("META-INF/sugarsv/licenses/${lf.name}")); zos << lf.bytes; zos.closeEntry() }
             def manifest = new StringBuilder('# sha256 path (extracted to config/fsr4linux-runtime by SugarSvPreLaunch)\n')
             rt.each { r, f -> zos.putNextEntry(new ZipEntry("sugarsv-runtime/${r}")); zos << f.bytes; zos.closeEntry(); manifest.append("${sha(f)} ${r}\n") }
             zos.putNextEntry(new ZipEntry('sugarsv-runtime/MANIFEST')); zos.write(manifest.toString().getBytes('UTF-8')); zos.closeEntry()
