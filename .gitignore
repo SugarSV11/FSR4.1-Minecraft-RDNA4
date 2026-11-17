@@ -67,8 +67,8 @@ uncommitted-changes-*.patch
 *.key
 
 # Binarios nativos pendientes de revisión para publicación
-fabric/src/main/resources/dev/fsr4linux/bootstrap/*.dll
-fabric/src/main/resources/dev/fsr4linux/bootstrap/*.so
+fabric/src/main/resources/dev/fsr4mc/bootstrap/*.dll
+fabric/src/main/resources/dev/fsr4mc/bootstrap/*.so
 
 # NVIDIA RTX SDK headers (proprietary licence, accepted by the user for local private use): never commit
 native/third_party/ngx/

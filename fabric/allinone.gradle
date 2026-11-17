@@ -1,5 +1,5 @@
-// SugarSV all-in-one jar: the fsr4linux jar + every compatible mod of the measured setup as Fabric nested jars (META-INF/jars, loaded by
-// Fabric Loader exactly as if they were in mods/) + the Windows native runtime (extracted by SugarSvPreLaunch into config/fsr4linux-runtime).
+// SugarSV all-in-one jar: the fsr4mc jar + every compatible mod of the measured setup as Fabric nested jars (META-INF/jars, loaded by
+// Fabric Loader exactly as if they were in mods/) + the Windows native runtime (extracted by SugarSvPreLaunch into config/fsr4mc-runtime).
 //   gradlew.bat allInOneJar   ->  build/libs/SugarSV-<version>-todo-en-uno.jar
 // Mod and runtime locations can be overridden with -PsugarsvMods=<dir;dir> and -PsugarsvRuntime=<dir>. Several bundled mods
 // (e.g. Sodium, now PolyForm Shield) have special redistribution conditions; the jar lists every bundled mod, licence, author and link in META-INF/sugarsv/THIRD_PARTY.txt.
@@ -12,7 +12,7 @@ import java.util.zip.ZipOutputStream
 
 def home = System.getProperty('user.home')
 def modDirs = (project.findProperty('sugarsvMods') ?: "${home}/OneDrive/Desktop/SugarSV-Mods;${home}/OneDrive/Desktop/Mod_FSR4_Java_Windows/dependencias_terceros").split(';').collect { file(it) }
-def runtimeDir = file(project.findProperty('sugarsvRuntime') ?: 'run/config/fsr4linux-runtime')
+def runtimeDir = file(project.findProperty('sugarsvRuntime') ?: (file('run/config/fsr4mc-runtime').exists() || !file('run/config/fsr4linux-runtime').exists() ? 'run/config/fsr4mc-runtime' : 'run/config/fsr4linux-runtime'))
 // The measured profile (docs/MOD_INTEGRATION.md, stage s3). Not bundled on purpose: Iris, Noisium, ModernFix, EnhancedBlockEntities, Sodium Extra,
 // MoreCulling (need Sodium 0.9.3, which breaks Aetherium 0.1.3), Dynamic FPS / FpsReducer2 (cap the frame rate), Krypton, Ksyxis, MemoryLeakFix.
 def bundledMods = [
@@ -81,7 +81,7 @@ tasks.register('allInOneJar') {
                     third.append("\n") }
             }
             licenceFiles.each { lf -> zos.putNextEntry(new ZipEntry("META-INF/sugarsv/licenses/${lf.name}")); zos << lf.bytes; zos.closeEntry() }
-            def manifest = new StringBuilder('# sha256 path (extracted to config/fsr4linux-runtime by SugarSvPreLaunch)\n')
+            def manifest = new StringBuilder('# sha256 path (extracted to config/fsr4mc-runtime by SugarSvPreLaunch)\n')
             rt.each { r, f -> zos.putNextEntry(new ZipEntry("sugarsv-runtime/${r}")); zos << f.bytes; zos.closeEntry(); manifest.append("${sha(f)} ${r}\n") }
             zos.putNextEntry(new ZipEntry('sugarsv-runtime/MANIFEST')); zos.write(manifest.toString().getBytes('UTF-8')); zos.closeEntry()
             third.append('\nNative runtime: fsr4linux.dll / fsr4_bridge.exe (this project, MIT) and the official AMD FidelityFX SDK 2.4.0 DLLs (binary only, see AMD_FidelityFX_SDK_license.md).\n')

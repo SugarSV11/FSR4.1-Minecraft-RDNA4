@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"; MODE="$1"; OUT="$2"; mkdir -p "$OUT"
 case "$MODE" in
   native) EN=false; BE=FSR4_1_1;; fsr315) EN=true; BE=FSR3_1_5;; fsr411) EN=true; BE=FSR4_1_1;; *) echo bad mode; exit 2;;
 esac
-CFG="$ROOT/fabric/run/config/fsr4linux.json"; cp "$CFG" "$OUT/cfg.orig"
+CFG="$ROOT/fabric/run/config/fsr4mc.json"; cp "$CFG" "$OUT/cfg.orig"
 echo "{\"enabled\": $EN, \"backend\": \"$BE\", \"quality\": \"QUALITY\", \"sharpness\": 0.5, \"debugOverlay\": false, \"fpsCounter\": false, \"frameGeneration\": false, \"fgPacing\": false}" > "$CFG"
 S="wait 40; cmd tp @s 300 142 300 0 0; fly; cmd fill 290 130 312 312 160 312 black_concrete; cmd kill @e[type=sheep]; cmd summon sheep 300 141 306 {NoAI:1b,Silent:1b,Color:0,Invulnerable:1b}; wait 60; cmd tp @s 300 142 300 0 0; wait 20; cmd tick freeze; wait 40; state"
 x=300.0

@@ -10,4 +10,4 @@ pluginManagement {
 }
 
 // Should match your modid
-rootProject.name = 'fsr4linux'
+rootProject.name = 'fsr4mc'

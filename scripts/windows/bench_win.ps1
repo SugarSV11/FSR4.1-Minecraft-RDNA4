@@ -8,7 +8,7 @@ if ($PaceK) { $env:FSR4_PACE_K = $PaceK } else { Remove-Item Env:FSR4_PACE_K -Er
 $pace = if ($Pacing) { "true" } else { "false" }
 $auto = if ($AutoPace) { "true" } else { "false" }   # default off so runs stay comparable with the earlier ones
 $cfg = "{`n  `"enabled`": $en,`n  `"backend`": `"FSR4_1_1`",`n  `"quality`": `"$Quality`",`n  `"sharpness`": $Sharp,`n  `"debugOverlay`": false,`n  `"fpsCounter`": false,`n  `"frameGeneration`": false,`n  `"fgPacing`": $pace,`n  `"fgPacingAuto`": $auto,`n  `"fgMultiplier`": $Mult,`n  `"fgGenerator`": `"$Gen`"`n}`n"
-Set-Content "$run\config\fsr4linux.json" $cfg -Encoding ascii
+Set-Content "$run\config\fsr4mc.json" $cfg -Encoding ascii
 $ae = if ($Shader) { '{"shaders":{"pack":"BetterVoxels_v1.8.zip","enabled":true,"renderScale":' + $Scale + '}' } else { '{"shaders":{"enabled":false}' }
 # One owner per optimisation: with FerriteCore loaded it owns block-state cache dedup, the PalettedContainer threading-detector removal
 # and the data-component patch map, so Aetherium's copies of the same three are switched off (mod_profile.ps1 stage s3).
@@ -35,7 +35,7 @@ SetOpt "enableVsync" $(if ($Vsync) { "true" } else { "false" }); SetOpt "maxFps"
 $t | Set-Content $opt -Encoding ascii
 Remove-Item "$run\fsr4-test.log", "$run\bench.csv" -ErrorAction SilentlyContinue
 $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-25.0.5.8-hotspot"; $env:Path = "$env:JAVA_HOME\bin;$env:Path"
-$env:FSR4_RUNTIME_DIR = "$run\config\fsr4linux-runtime"
+$env:FSR4_RUNTIME_DIR = "$run\config\fsr4mc-runtime"
 $tog = switch ($Mode) { "fsr" { "key toggle; " } "fg" { "key fg; " } "fsr_fg" { "key toggle; wait 100; key fg; " } default { "" } }
 $env:FSR4_SCRIPT = "wait 40; cmd /tp @s 300 140 300; wait 80; fly; look 30 20; wait $Wait; $Pre $tog wait 150; state; shot scene_$Mode$Tag; wait 10; bench r1 200; bench r2 200; bench r3 200; log state-end; state; quit"
 Set-Location "$root\fabric"

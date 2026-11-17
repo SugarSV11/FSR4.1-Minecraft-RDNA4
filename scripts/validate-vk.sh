@@ -5,7 +5,7 @@ set -uo pipefail; cd "$(dirname "$0")/.."
 MODE="${1:-fg3}"; LAYERS="${VVL_DIR:-$HOME/.cache/fsr4-linux/vvl/src/build/layers}"
 FG=true
 case "$MODE" in native) BE=NATIVE; EN=false; FG=false; M=2;; fsr) BE=FSR4_1_1; EN=true; FG=false; M=2;; fg3) BE=NATIVE; EN=false; M=3;; fg4) BE=NATIVE; EN=false; M=4;; fsr_fg3) BE=FSR4_1_1; EN=true; M=3;; fsr_fg4) BE=FSR4_1_1; EN=true; M=4;; *) echo bad mode; exit 2;; esac
-printf '{\n "enabled": %s,\n "backend": "%s",\n "quality": "QUALITY",\n "sharpness": 0.5,\n "debugOverlay": false,\n "fpsCounter": false,\n "frameGeneration": %s,\n "fgPacing": false,\n "fgMultiplier": %s\n}\n' "$EN" "$BE" "$FG" "$M" > fabric/run/config/fsr4linux.json
+printf '{\n "enabled": %s,\n "backend": "%s",\n "quality": "QUALITY",\n "sharpness": 0.5,\n "debugOverlay": false,\n "fpsCounter": false,\n "frameGeneration": %s,\n "fgPacing": false,\n "fgMultiplier": %s\n}\n' "$EN" "$BE" "$FG" "$M" > fabric/run/config/fsr4mc.json
 STEPS="${2:-wait 60; cmd tp @s 300 140 300; wait 80; fly; look 30 20; wait 80; turn 1.5 60; wait 30; fullscreen; wait 60; fullscreen; wait 60; key fg; wait 60; key fg; wait 80; state; quit}"
 OUT="${VAL_OUT:-/tmp/validate-$MODE.txt}"; rm -f fabric/run/fsr4-test.log
 VK_LAYER_PATH="$LAYERS" VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation VK_LAYER_ENABLES=VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT \

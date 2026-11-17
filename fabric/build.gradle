@@ -6,7 +6,7 @@ plugins {
 import java.security.MessageDigest
 import java.util.zip.ZipFile
 
-def bootstrapPrefix = 'dev/fsr4linux/bootstrap/'
+def bootstrapPrefix = 'dev/fsr4mc/bootstrap/'
 def bootstrapSource = file('src/main/resources/' + bootstrapPrefix)
 def generatedBootstrap = layout.buildDirectory.dir('generated/bootstrap')
 def nativeArtifacts = [
@@ -95,11 +95,11 @@ repositories {
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/fsr4linux.accesswidener")
+	accessWidenerPath = file("src/main/resources/fsr4mc.accesswidener")
 	splitEnvironmentSourceSets()
 
 	mods {
-		"fsr4linux" {
+		"fsr4mc" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -117,7 +117,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
-sourceSets.main.resources.exclude 'dev/fsr4linux/bootstrap/**'
+sourceSets.main.resources.exclude 'dev/fsr4mc/bootstrap/**'
 
 processResources {
 	dependsOn tasks.named('prepareBundledResources')
@@ -145,7 +145,7 @@ java {
 }
 
 jar {
-	from("../LICENSE") { rename { "${it}_fsr4linux" } }
+	from("../LICENSE") { rename { "${it}_fsr4mc" } }
 }
 
 // configure the maven publication

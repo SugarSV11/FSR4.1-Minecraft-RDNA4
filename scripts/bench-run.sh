@@ -10,7 +10,7 @@ L=$(cut -d' ' -f1 /proc/loadavg); echo "load=$L"
 OPT="$ROOT/fabric/run/options.txt"
 sed -i "s/^enableVsync:.*/enableVsync:${VSYNC:-false}/; s/^maxFps:.*/maxFps:260/; s/^inactivityFpsLimit:.*/inactivityFpsLimit:\"minimized\"/" "$OPT"
 [ -n "$RD" ] && sed -i "s/^renderDistance:.*/renderDistance:$RD/; s/^graphicsPreset:.*/graphicsPreset:\"custom\"/" "$OPT"
-[ "${KEEP_CONFIG:-0}" = 1 ] || printf '{\n  "enabled": %s,\n  "backend": "%s",\n  "quality": "%s",\n  "sharpness": 0.5,\n  "debugOverlay": false,\n  "fpsCounter": false,\n  "frameGeneration": false,\n  "fgPacing": %s\n}\n' "$EN" "$BE" "$Q" "${FG_PACING:-false}" > "$ROOT/fabric/run/config/fsr4linux.json"
+[ "${KEEP_CONFIG:-0}" = 1 ] || printf '{\n  "enabled": %s,\n  "backend": "%s",\n  "quality": "%s",\n  "sharpness": 0.5,\n  "debugOverlay": false,\n  "fpsCounter": false,\n  "frameGeneration": false,\n  "fgPacing": %s\n}\n' "$EN" "$BE" "$Q" "${FG_PACING:-false}" > "$ROOT/fabric/run/config/fsr4mc.json"
 for kv in graphicsPreset="fancy" renderDistance=16 improvedTransparency=false ${OPT_OVERRIDES:-}; do k="${kv%%=*}"; v="${kv#*=}"; if grep -q "^$k:" "$OPT"; then sed -i "s|^$k:.*|$k:$v|" "$OPT"; else echo "$k:$v" >> "$OPT"; fi; done
 rm -f "$ROOT/fabric/run/fsr4-test.log" "$ROOT/fabric/run/bench.csv"
 D=/sys/class/drm/card1/device; GPU_LOG="${OUT%.csv}.gpu"; : > "$GPU_LOG"

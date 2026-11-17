@@ -4,7 +4,7 @@
 # Usage: [AB=1] [TICKRATE=n] [TICKCMD="freeze"|"rate 5"|...] x3-scene.sh SCENE OUTDIR   (TICKRATE: /tick rate during the recording; the harness records at ~1.6 fps, i.e. ~12 game ticks per frame at the normal rate - TICKRATE=1 gives ~0.6, much closer to real-time frame spacing)   SCENE = particles | water | vegetation | transparency | disocclusion | animals | baseline
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; SC="$1"; OUT="$2"; mkdir -p "$OUT/planes"
-CFG="$ROOT/fabric/run/config/fsr4linux.json"; cp "$CFG" "$OUT/cfg.orig"
+CFG="$ROOT/fabric/run/config/fsr4mc.json"; cp "$CFG" "$OUT/cfg.orig"
 echo '{"enabled": false, "backend": "FSR4_1_1", "quality": "QUALITY", "sharpness": 0.5, "debugOverlay": false, "fpsCounter": false, "frameGeneration": true, "fgPacing": false, "fgMultiplier": 3}' > "$CFG"
 P="wait 40; cmd tp @s 300.5 152 300.5 0 8; fly; cmd time set noon; cmd gamerule mob_griefing false; cmd difficulty peaceful; cmd kill @e[type=!player]; cmd fill 284 144 296 318 166 313 air; cmd fill 288 148 312 314 162 312 black_concrete"
 STRAFE=0; PR=0.1; YR=0.15

@@ -5,7 +5,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; MODE="$1"; OUT="$2"; mkdir -p "$OUT"
 case "$MODE" in native) EN=false; BE=FSR4_1_1;; fsr315) EN=true; BE=FSR3_1_5;; fsr411) EN=true; BE=FSR4_1_1;; *) echo bad mode; exit 2;; esac
-CFG="$ROOT/fabric/run/config/fsr4linux.json"; cp "$CFG" "$OUT/cfg.orig"
+CFG="$ROOT/fabric/run/config/fsr4mc.json"; cp "$CFG" "$OUT/cfg.orig"
 echo "{\"enabled\": $EN, \"backend\": \"$BE\", \"quality\": \"${QUALITY:-QUALITY}\", \"sharpness\": 0.5, \"debugOverlay\": false, \"fpsCounter\": false, \"frameGeneration\": ${FG:-false}, \"fgPacing\": false, \"fgMultiplier\": ${FGMULT:-2}}" > "$CFG"
 S="wait 40; cmd tp @s 300.5 152 300.5 0 8; fly; cmd time set noon; cmd kill @e[type=!player]; cmd fill 288 148 312 314 162 312 black_concrete; cmd fill 296 150 308 299 153 310 oak_leaves[persistent=true]"
 S="$S; cmd fill 301 149 307 306 150 311 stone; cmd fill 302 150 308 305 150 310 water; cmd fill 291 150 308 295 153 308 light_blue_stained_glass; cmd kill @e[type=sheep]"

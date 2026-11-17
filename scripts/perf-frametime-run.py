@@ -51,7 +51,7 @@ for i, line in enumerate(options):
         seen.add(key)
 options.extend(f"{key}:{value}" for key, value in overrides.items() if key not in seen)
 (PROFILE / "options.txt").write_text("\n".join(options) + "\n")
-(PROFILE / "config/fsr4linux.json").write_text(json.dumps({
+(PROFILE / "config/fsr4mc.json").write_text(json.dumps({
     "enabled": False, "backend": "NATIVE", "quality": "QUALITY", "sharpness": 0.5,
     "debugOverlay": False, "fpsCounter": False, "frameGeneration": False,
     "fgPacing": False, "fgMultiplier": 2,

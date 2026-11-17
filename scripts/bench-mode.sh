@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 OUT="$1"; MODE="$2"; REPS="${3:-3}"; Q="${FSR_QUALITY:-QUALITY}"
 case "$MODE" in native) BE=NATIVE; EN=false; FG=false; M=2;; fsr) BE=FSR4_1_1; EN=true; FG=false; M=2;; fg2) BE=NATIVE; EN=false; FG=true; M=2;; fg3) BE=NATIVE; EN=false; FG=true; M=3;; fg4) BE=NATIVE; EN=false; FG=true; M=4;;
  fsr_fg2) BE=FSR4_1_1; EN=true; FG=true; M=2;; fsr_fg3) BE=FSR4_1_1; EN=true; FG=true; M=3;; fsr_fg4) BE=FSR4_1_1; EN=true; FG=true; M=4;; *) echo bad mode; exit 2;; esac
-printf '{\n  "enabled": %s,\n  "backend": "%s",\n  "quality": "%s",\n  "sharpness": 0.5,\n  "debugOverlay": false,\n  "fpsCounter": false,\n  "frameGeneration": %s,\n  "fgPacing": false,\n  "fgMultiplier": %s\n}\n' "$EN" "$BE" "$Q" "$FG" "$M" > fabric/run/config/fsr4linux.json
+printf '{\n  "enabled": %s,\n  "backend": "%s",\n  "quality": "%s",\n  "sharpness": 0.5,\n  "debugOverlay": false,\n  "fpsCounter": false,\n  "frameGeneration": %s,\n  "fgPacing": false,\n  "fgMultiplier": %s\n}\n' "$EN" "$BE" "$Q" "$FG" "$M" > fabric/run/config/fsr4mc.json
 STEPS="${PRE_STEPS:+$PRE_STEPS; }wait 100"; for i in $(seq 1 "$REPS"); do STEPS="$STEPS; bench r$i 200"; done
 KEEP_CONFIG=1 WAIT_IDLE=1 scripts/bench-run.sh "$OUT" 1920 1080 "$BE $Q $EN" "$STEPS ${BENCH_EXTRA_STEPS:-}" >/dev/null 2>&1 || true
 python3 - "$OUT" <<'PY'

@@ -1,0 +1,8 @@
+{
+	"key.category.fsr4mc.main": "FSR Upscaling",
+	"key.fsr4mc.version": "FSR: switch version (3.1.5 / 4.1.1)",
+	"key.fsr4mc.quality": "FSR: cycle quality mode",
+	"key.fsr4mc.toggle": "FSR: enable / disable",
+	"key.fsr4mc.framegen": "FSR Frame Generation: enable / disable",
+	"key.fsr4mc.settings": "FSR: open settings"
+}

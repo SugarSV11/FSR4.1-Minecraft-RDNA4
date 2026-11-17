@@ -34,6 +34,6 @@ cl /nologo /std:c++20 /EHsc /O2 /DVK_USE_PLATFORM_WIN32_KHR /DFSR4_NATIVE_WINDOW
   tests\win_smoke.cpp native\src\bridge_client.cpp native\src\gpu_bridge.cpp /Fe:"%OUT%\win_smoke.exe" /Fo:"%OUT%\obj\\" user32.lib winmm.lib || exit /b 1
 
 echo.
-echo Done. Copy into <minecraft>\config\fsr4linux-runtime: lib\fsr4linux.dll, bridge\fsr4_bridge.exe plus the official AMD DLLs
+echo Done. Copy into <minecraft>\config\fsr4mc-runtime: lib\fsr4linux.dll, bridge\fsr4_bridge.exe plus the official AMD DLLs
 echo (amd_fidelityfx_loader_dx12.dll, amd_fidelityfx_upscaler_dx12.dll, optional amd_fidelityfx_framegeneration_dx12.dll) next to the helper.
 endlocal
