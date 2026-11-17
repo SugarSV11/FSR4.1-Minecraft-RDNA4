@@ -45,6 +45,10 @@ public final class SugarSvPreLaunch implements PreLaunchEntrypoint {
 		FabricLoader fl = FabricLoader.getInstance();
 		if (fl.getEnvironmentType() != EnvType.CLIENT) return;
 		Path config = fl.getConfigDir(), game = fl.getGameDir();
+		try {   // fsr4linux -> fsr4mc: config files and keybinds, before Minecraft reads options.txt
+			var r = dev.fsr4mc.core.LegacyMigration.migrate(config, game.resolve("options.txt"));
+			if (r.changedAnything()) LOG.info("SugarSV: migrated from fsr4linux: {} config entr(ies), {} keybind(s)", r.copied().size(), r.keybindsMigrated());
+		} catch (Throwable t) { LOG.warn("SugarSV: fsr4linux migration failed: {}", t.toString()); }
 		try { installRuntime(config.resolve("fsr4mc-runtime")); } catch (Throwable t) { LOG.warn("SugarSV: runtime install failed: {}", t.toString()); }
 		Path marker = config.resolve("sugarsv-installed.json");
 		if (!Files.exists(marker)) {
