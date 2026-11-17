@@ -62,7 +62,7 @@ Probado en una **RX 9060 XT**, 1080p, shaders Better Voxels:
 2. **Descarga el `.jar`** desde [Releases](../../releases/latest) y ponlo en tu carpeta `mods/`.
    - Pon **solo ese jar**: Sodium, Fabric API y el resto ya van dentro. Quita cualquier otro jar de `mods/`.
 3. **Abre el juego.** La primera vez el mod configura todo solo:
-   - instala sus archivos en `config/fsr4linux-runtime`,
+   - instala sus archivos en `config/fsr4mc-runtime`,
    - cambia el motor gráfico a **Vulkan** y activa **VSync**,
    - activa **FSR 4.1 calidad + Frame Generation x2 + pacing automático**.
 
@@ -79,7 +79,8 @@ Probado en una **RX 9060 XT**, 1080p, shaders Better Voxels:
 
 En el menú del mod puedes elegir generador, multiplicador y pacing. **Deja el multiplicador en x2**: x3 y x4 son experimentales y van mal con VSync.
 
-> ℹ️ Los archivos internos conservan el nombre `fsr4linux` (carpeta `config/fsr4linux-runtime`, `config/fsr4linux.json`) para no romper configuraciones ya guardadas.
+> ℹ️ **Migración automática:** el mod se llamaba antes `fsr4linux`. Al arrancar copia `config/fsr4linux*` a `config/fsr4mc*` (sin borrar ni pisar nada) y pasa tus teclas `key.fsr4linux.*` de `options.txt` a `key.fsr4mc.*`; antes guarda `options.txt.fsr4linux.bak`. Las librerías nativas (`fsr4linux.dll`) conservan su nombre.
+> 🧪 Pendiente: probar la migración en el juego.
 
 ---
 

@@ -55,14 +55,17 @@ RX 9060 XT, 1080p, Better Voxels shaders:
 
 1. Install **Minecraft 26.3 with Fabric Loader 0.19.5**.
 2. Download the `.jar` from [Releases](../../releases/latest) and put it in `mods/`. Use **only this jar** (Sodium, Fabric API and the rest are inside).
-3. Launch the game. The first run configures everything: installs its files in `config/fsr4linux-runtime`, switches the graphics backend to **Vulkan**, enables **VSync**, and turns on **FSR 4.1 quality + Frame Generation x2 + automatic pacing**.
+3. Launch the game. The first run configures everything: installs its files in `config/fsr4mc-runtime`, switches the graphics backend to **Vulkan**, enables **VSync**, and turns on **FSR 4.1 quality + Frame Generation x2 + automatic pacing**.
 
 | Key | Action |
 |:---:|---|
 | `F10` | Toggle FSR |
 | `F7` | Toggle Frame Generation |
 
-Keep the multiplier at x2: x3 and x4 are experimental and misbehave with VSync. Internal files keep the `fsr4linux` name so existing configs keep working.
+Keep the multiplier at x2: x3 and x4 are experimental and misbehave with VSync. 
+
+> ℹ️ **Automatic migration:** the mod used to be called `fsr4linux`. On startup it copies `config/fsr4linux*` to `config/fsr4mc*` (nothing is deleted or overwritten) and moves your `key.fsr4linux.*` keybinds in `options.txt` to `key.fsr4mc.*`, saving `options.txt.fsr4linux.bak` first. Native libraries (`fsr4linux.dll`) keep their name.
+> 🧪 Pending: testing the migration in game.
 
 ## 🧩 Bundled mods
 
